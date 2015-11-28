@@ -43,6 +43,7 @@ h1 {
 }
 
 .block {
+	cursor : pointer;
 	margin: 13px 0 0 13px;
 	float:left;
 	display: inline;

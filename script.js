@@ -1,26 +1,33 @@
+var board = [[],[],[]];
 var dragBlockl,dragBlockt;
-
 var marginVal = 13;
+var emptyX,emptyY;
 
-function moveLimit() {
-		var x1=dragBlockl-marginVal;
-		var y1=dragBlockt-marginVal;
-		var x2=$('.empty').offset().left-marginVal;
-		var y2=$('.empty').offset().top-marginVal;
-		var inc = 100 + marginVal;
+function moveLimit(dragged) {
+		//prompt(emptyX + " " + emptyY
+		var x1=(dragBlockl=dragged.offset().left)-marginVal;
+		var y1=(dragBlockt=dragged.offset().top)-marginVal;
+		var x2=board[emptyX][emptyY].offset().left-marginVal;
+		var y2=board[emptyX][emptyY].offset().top-marginVal;
+		var inc = dragged.height() + marginVal;
 
 		//Down
-		if(x1===x2&&y2===y1+inc) return [x1,y1,x1,y1+inc];
+		if(emptyX&&dragged.is(board[emptyX-1][emptyY])) return [x1,y1,x1,y1+inc];
 		//Up
-		else if(x1===x2&&y2+inc===y1) return [x1,y2,x1,y2+inc];
-		//Left
-		else if(x1===x2+inc&&y2===y1) return [x2,y1,x1+inc,y1];
+		else if(emptyX<board.length-1&&dragged.is(board[emptyX+1][emptyY])) return [x1,y2,x1,y2+inc];
 		//Right
-		else if(x1+inc===x2&&y2===y1) return [x1,y1,x1+inc,y1];
+		else if(emptyY&&dragged.is(board[emptyX][emptyY-1])) return [x1,y1,x1+inc,y1];
+		//Left
+		else if(emptyY<board.length-1&&dragged.is(board[emptyX][emptyY+1])) return [x2,y1,x1,y1];
+
 		return [x1,y1,x1,y1];
 	};
 
 function swapBlocks(event,ui){
+	var draggedX,draggedY;
+	for(var i=0;i<3;i++) for(var j=0;j<3;j++){
+		if($(ui.helper).is(board[i][j])) draggedX=i,draggedY=j;
+	}
 	var x1=ui.offset.left-marginVal;
 	var y1=ui.offset.top-marginVal;
 	var x2=$('.empty').offset().left-marginVal;
@@ -30,20 +37,41 @@ function swapBlocks(event,ui){
 		var tmp = $('.empty').offset();
 		$('.empty').offset({ top: dragBlockt, left: dragBlockl});
 		dragBlockt = tmp.top; dragBlockl=tmp.left;
+
+		tmp = board[emptyX][emptyY]; 
+		board[emptyX][emptyY] = board[draggedX][draggedY];
+		board[draggedX][draggedY]=tmp;
+
+		tmp = emptyX;
+		emptyX = draggedX;
+		draggedX = tmp;
+
+		tmp = emptyY;
+		emptyY = draggedY;
+		draggedY = tmp;
 	}
-	$(this).offset({ top: dragBlockt, left: dragBlockl});
+	board[draggedX][draggedY].offset({ top: dragBlockt, left: dragBlockl});
 };
 
 function resolve(){
 
 }
 
+function Initialize(){
+	emptyX=emptyY=0;
+	for(var i=0;i<3;i++) for(var j=0;j<3;j++){
+		board[i][j]=$("<div class='block'>"+(i*3+j)+"</div>");
+		if(i===emptyX&&j===emptyY) board[i][j]=$("<div class='empty'></div>");
+		$(".board").append(board[i][j]);
+	}
+}
+
 var main = function(){
+	Initialize();
+	var tmp;
 	$('.block').mousedown(function(){
-		dragBlockl = $(this).offset().left;
-		dragBlockt = $(this).offset().top;
+		tmp = moveLimit($(this));
 	}).mousemove(function(){
-		var tmp = moveLimit();
 		$('.block').draggable({
 			"scroll":false,
 			containment:tmp,
