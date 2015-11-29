@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
 	<title>Sliding Blocks</title>
-	<body>
-		<h1 class="col-md-5">Shuffle the puzzle then click to resolve!</h1>
-		<div class="col-md-1"></div>
-		<div class="board">
-			
+	<body style="overflow: hidden;">
+		<div class="indicator col-md-3">
+			2&nbsp;&nbsp;3&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;6&nbsp;&nbsp;7&nbsp;&nbsp;8&nbsp;&nbsp;9
 		</div>
+		<div class="col-md-7" style="float:right; height:700px">
+			<div class="board"></div>
+		</div>
+		<div class="slider-body col-md-3">
+			<div class="handler"></div>
+		</div>
+		<h1 class="col-md-3">Shuffle and click!</h1>
 		<div class="col-md-3 solve">Resolve</div>
 	</body>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">

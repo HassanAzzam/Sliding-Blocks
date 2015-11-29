@@ -1,7 +1,10 @@
-var board = [[],[],[]];
+var board;
 var dragBlockl,dragBlockt;
+var blockD=100;
 var marginVal = 13;
 var emptyX,emptyY;
+var N = 2;
+
 
 function moveLimit(dragged) {
 		//prompt(emptyX + " " + emptyY
@@ -25,7 +28,7 @@ function moveLimit(dragged) {
 
 function swapBlocks(event,ui){
 	var draggedX,draggedY;
-	for(var i=0;i<3;i++) for(var j=0;j<3;j++){
+	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
 		if($(ui.helper).is(board[i][j])) draggedX=i,draggedY=j;
 	}
 	var x1=ui.offset.left-marginVal;
@@ -33,7 +36,7 @@ function swapBlocks(event,ui){
 	var x2=$('.empty').offset().left-marginVal;
 	var y2=$('.empty').offset().top-marginVal;
 
-	if(Math.abs(x1-x2)+Math.abs(y1-y2)<=(100+marginVal)/2) {
+	if(Math.abs(x1-x2)+Math.abs(y1-y2)<=(board[draggedX][draggedY].height()+marginVal)/2) {
 		var tmp = $('.empty').offset();
 		$('.empty').offset({ top: dragBlockt, left: dragBlockl});
 		dragBlockt = tmp.top; dragBlockl=tmp.left;
@@ -54,20 +57,28 @@ function swapBlocks(event,ui){
 };
 
 function resolve(){
-
+	
 }
 
 function Initialize(){
+
+	$('.board').empty();
+	$('.board').width(marginVal+N*(marginVal+blockD));
+	$('.board').height(marginVal+N*(marginVal+blockD));
+	board=[];
+	var t = $('.col-md-7').height()/2-$('.board').height()/2;
+	var l = $('.col-md-7').width()/2-$('.board').width()/2;
+
+	$('.board').offset({top: t, left: l + $('.col-md-7').offset().left });
 	emptyX=emptyY=0;
-	for(var i=0;i<3;i++) for(var j=0;j<3;j++){
-		board[i][j]=$("<div class='block'>"+(i*3+j)+"</div>");
+	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
+		if(!j) board.push([]);
+		board[i].push($("<div class='block'>"+(i*N+j)+"</div>"));
 		if(i===emptyX&&j===emptyY) board[i][j]=$("<div class='empty'></div>");
 		$(".board").append(board[i][j]);
 	}
-}
 
-var main = function(){
-	Initialize();
+	//Drag event listeners
 	var tmp;
 	$('.block').mousedown(function(){
 		tmp = moveLimit($(this));
@@ -78,8 +89,29 @@ var main = function(){
 			stop: swapBlocks
 		});
 	});
+}
+
+var main = function(){
+	//$('.handler').offset({left:$('.handler').offset().left + 40.5});
+	Initialize();
+	
 
 	$('.resolve').click(resolve());
+
+	var handler = $('.handler').offset().left;
+	$('.handler').draggable({
+		start: function(e,ui){
+			handler = $('.handler').offset().left;
+		},
+		axis: 'x',
+		grid: [40.5,0],
+		containment: "parent",
+		drag: function(e,ui){
+			N=2+Math.floor(($('.handler').offset().left-47.5)/40.5);
+			Initialize();
+		}
+	});
+	
 };
 
 $(document).ready(main);
