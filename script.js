@@ -56,85 +56,89 @@ function swapBlocks(event,ui){
 };
 
 function MoveGenerator(heu){
-	var Q = new PriorityQueue({ initialValues:[[0,heu,emptyX,emptyY,board]], comparator: function(a, b) { 
-		if(a[0]>b[0]||(a[0]===b[0]&&a[1]>b[1])) return 1;
-		return 0;
+	var Q = new PriorityQueue({ comparator: function(a, b) { 
+		if(a[0]+a[1]>b[0]+b[1]) return 1;
+		return -1;
 	}});
+	var b=[];
+	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
+		if(!j) b.push([]);
+		b[i].push(parseInt(board[i][j][0].outerText,10));
+	}
+
+	Q.queue([0,heu,emptyX,emptyY,b]);
 	while(Q.length){
 		var cur = Q.dequeue();
-		if(!cur[1]) {
-			alert(cur[0]);
-			return;
+		function swapBoard(x,y){
+			var tmp = nb[x][y];
+			nb[x][y] = nb[cur[2]][cur[3]];
+			nb[cur[2]][cur[3]] = tmp;
 		}
 		if(cur[2]>0){
 			//
 			heu = cur[1];
-			var x = Math.floor(parseInt(cur[4][cur[2]-1][cur[3]][0].outerText,10)/N);
+			var x = Math.floor(cur[4][cur[2]-1][cur[3]]/N);
 			if(x>=cur[2]) heu--;
 			else heu++;
 			heu--;
-			
-			//
-			var tmp = cur[4][cur[2]-1][cur[3]];
-			cur[4][cur[2]-1][cur[3]] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			if(!heu) {
+				alert(cur[0]+1);
+				return;
+			}	
 
-			Q.queue([cur[0]+1,heu,cur[2]-1,cur[3],cur[4]]);
+			var nb = $.extend(true, [], cur[4]); 
+			swapBoard(cur[2]-1,cur[3]);
 
-			tmp = cur[4][cur[2]-1][cur[3]];
-			cur[4][cur[2]-1][cur[3]] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			Q.queue([cur[0]+1,heu,cur[2]-1,cur[3],nb]);
+
+			//swapBoard(cur[2]-1,cur[3]);
+
 		}
 		if(cur[2]<N-1){
 			heu = cur[1];
-			var x = Math.floor(parseInt(cur[4][cur[2]+1][cur[3]][0].outerText,10)/N);
+			var x = Math.floor(cur[4][cur[2]+1][cur[3]]/N);
 			if(x<=cur[2]) heu--;
 			else heu++;
 			heu++;
 
-			var tmp = cur[4][cur[2]+1][cur[3]];
-			cur[4][cur[2]+1][cur[3]] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			var nb = $.extend(true, [], cur[4]); 
+			swapBoard(cur[2]+1,cur[3]);
 
-			Q.queue([cur[0]+1,heu,cur[2]+1,cur[3],cur[4]]);
+			Q.queue([cur[0]+1,heu,cur[2]+1,cur[3],nb]);
 
-			tmp = cur[4][cur[2]+1][cur[3]];
-			cur[4][cur[2]+1][cur[3]] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			//swapBoard(cur[2]+1,cur[3]);
 		}
 		if(cur[3]>0){
 			heu = cur[1];
-			var y = Math.floor(parseInt(cur[4][cur[2]][cur[3]-1][0].outerText,10)%N);
+			var y = Math.floor(cur[4][cur[2]][cur[3]-1]%N);
 			if(y>=cur[3]) heu--;
 			else heu++;
 			heu--;
+			if(!heu) {
+				alert(cur[0]+1);
+				return;
+			}	
 
-			var tmp = cur[4][cur[2]][cur[3]-1];
-			cur[4][cur[2]][cur[3]-1] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			var nb = $.extend(true, [], cur[4]); 
+			swapBoard(cur[2],cur[3]-1);
 
-			Q.queue([cur[0]+1,heu,cur[2],cur[3]-1,cur[4]]);
+			Q.queue([cur[0]+1,heu,cur[2],cur[3]-1,nb]);
 
-			tmp = cur[4][cur[2]][cur[3]-1];
-			cur[4][cur[2]][cur[3]-1] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			//swapBoard(cur[2],cur[3]-1);
 		}
 		if(cur[3]<N-1){
 			heu = cur[1];
-			var y = Math.floor(parseInt(cur[4][cur[2]][cur[3]+1][0].outerText,10)%N);
+			var y = Math.floor(cur[4][cur[2]][cur[3]+1]%N);
 			if(y<=cur[3]) heu--;
 			else heu++;
 			heu++;
 
-			var tmp = cur[4][cur[2]][cur[3]+1];
-			cur[4][cur[2]][cur[3]+1] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			var nb = $.extend(true, [], cur[4]); 	
+			swapBoard(cur[2],cur[3]+1);
 
-			Q.queue([cur[0]+1,heu,cur[2],cur[3]+1,cur[4]]);
+			Q.queue([cur[0]+1,heu,cur[2],cur[3]+1,nb]);
 
-			tmp = cur[4][cur[2]][cur[3]+1];
-			cur[4][cur[2]][cur[3]+1] = cur[4][cur[2]][cur[3]];
-			cur[4][cur[2]][cur[3]] = tmp;
+			//swapBoard(cur[2],cur[3]+1);
 		}
 	}
 }
