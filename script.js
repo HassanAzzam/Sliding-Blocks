@@ -1,10 +1,9 @@
 var board;
 var dragBlockl,dragBlockt;
 var blockD=100;
-var marginVal = 13;
+var marginVal;
 var emptyX,emptyY;
 var N = 2;
-
 
 function moveLimit(dragged) {
 		//prompt(emptyX + " " + emptyY
@@ -15,13 +14,13 @@ function moveLimit(dragged) {
 		var inc = dragged.height() + marginVal;
 
 		//Down
-		if(emptyX&&dragged.is(board[emptyX-1][emptyY])) return [x1,y1,x1,y1+inc];
+		if(emptyX&&dragged.is(board[emptyX-1][emptyY])) return [x2,y1,x2,y1+inc];
 		//Up
-		else if(emptyX<board.length-1&&dragged.is(board[emptyX+1][emptyY])) return [x1,y2,x1,y2+inc];
+		else if(emptyX<board.length-1&&dragged.is(board[emptyX+1][emptyY])) return [x2,y2,x2,y2+inc];
 		//Right
-		else if(emptyY&&dragged.is(board[emptyX][emptyY-1])) return [x1,y1,x1+inc,y1];
+		else if(emptyY&&dragged.is(board[emptyX][emptyY-1])) return [x2,y2,x1+inc,y2];
 		//Left
-		else if(emptyY<board.length-1&&dragged.is(board[emptyX][emptyY+1])) return [x2,y1,x1,y1];
+		else if(emptyY<board.length-1&&dragged.is(board[emptyX][emptyY+1])) return [x2,y2,x1,y2];
 
 		return [x1,y1,x1,y1];
 	};
@@ -56,15 +55,122 @@ function swapBlocks(event,ui){
 	board[draggedX][draggedY].offset({ top: dragBlockt, left: dragBlockl});
 };
 
-function resolve(){
-	
+function MoveGenerator(heu){
+	var Q = new PriorityQueue({ initialValues:[[0,heu,emptyX,emptyY,board]], comparator: function(a, b) { 
+		if(a[0]>b[0]||(a[0]===b[0]&&a[1]>b[1])) return 1;
+		return 0;
+	}});
+	while(Q.length){
+		var cur = Q.dequeue();
+		if(!cur[1]) {
+			alert(cur[0]);
+			return;
+		}
+		if(cur[2]>0){
+			//
+			heu = cur[1];
+			var x = Math.floor(parseInt(cur[4][cur[2]-1][cur[3]][0].outerText,10)/N);
+			if(x>=cur[2]) heu--;
+			else heu++;
+			heu--;
+			
+			//
+			var tmp = cur[4][cur[2]-1][cur[3]];
+			cur[4][cur[2]-1][cur[3]] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+
+			Q.queue([cur[0]+1,heu,cur[2]-1,cur[3],cur[4]]);
+
+			tmp = cur[4][cur[2]-1][cur[3]];
+			cur[4][cur[2]-1][cur[3]] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+		}
+		if(cur[2]<N-1){
+			heu = cur[1];
+			var x = Math.floor(parseInt(cur[4][cur[2]+1][cur[3]][0].outerText,10)/N);
+			if(x<=cur[2]) heu--;
+			else heu++;
+			heu++;
+
+			var tmp = cur[4][cur[2]+1][cur[3]];
+			cur[4][cur[2]+1][cur[3]] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+
+			Q.queue([cur[0]+1,heu,cur[2]+1,cur[3],cur[4]]);
+
+			tmp = cur[4][cur[2]+1][cur[3]];
+			cur[4][cur[2]+1][cur[3]] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+		}
+		if(cur[3]>0){
+			heu = cur[1];
+			var y = Math.floor(parseInt(cur[4][cur[2]][cur[3]-1][0].outerText,10)%N);
+			if(y>=cur[3]) heu--;
+			else heu++;
+			heu--;
+
+			var tmp = cur[4][cur[2]][cur[3]-1];
+			cur[4][cur[2]][cur[3]-1] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+
+			Q.queue([cur[0]+1,heu,cur[2],cur[3]-1,cur[4]]);
+
+			tmp = cur[4][cur[2]][cur[3]-1];
+			cur[4][cur[2]][cur[3]-1] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+		}
+		if(cur[3]<N-1){
+			heu = cur[1];
+			var y = Math.floor(parseInt(cur[4][cur[2]][cur[3]+1][0].outerText,10)%N);
+			if(y<=cur[3]) heu--;
+			else heu++;
+			heu++;
+
+			var tmp = cur[4][cur[2]][cur[3]+1];
+			cur[4][cur[2]][cur[3]+1] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+
+			Q.queue([cur[0]+1,heu,cur[2],cur[3]+1,cur[4]]);
+
+			tmp = cur[4][cur[2]][cur[3]+1];
+			cur[4][cur[2]][cur[3]+1] = cur[4][cur[2]][cur[3]];
+			cur[4][cur[2]][cur[3]] = tmp;
+		}
+	}
+}
+
+var resolve = function(){
+	var heu=0;
+	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
+		var x = Math.floor(parseInt(board[i][j][0].outerText,10)/N);
+		var y = Math.floor(parseInt(board[i][j][0].outerText,10)%N);
+		heu+=Math.abs(i-x)+Math.abs(j-y);
+	}
+	MoveGenerator(heu);
+
+}
+
+function updateCSS(){
+	marginVal = $('.board').width()/(1+8*N);
+	length = 7*marginVal;
+	$('.block').css({
+		"margin-top": marginVal, 
+		"margin-left": marginVal, 
+		"height": length, 
+		"width": length,
+		"font-size": 4*marginVal
+	});
+
 }
 
 function Initialize(){
 
+	//marginVal = $('.block').css("margin-top");
 	$('.board').empty();
-	$('.board').width(marginVal+N*(marginVal+blockD));
-	$('.board').height(marginVal+N*(marginVal+blockD));
+	/*
+	$('.board').width((marginVal+N*(marginVal+blockD)));
+	$('.board').height((marginVal+N*(marginVal+blockD)));
+	*/
 	board=[];
 	var t = $('.col-md-7').height()/2-$('.board').height()/2;
 	var l = $('.col-md-7').width()/2-$('.board').width()/2;
@@ -74,9 +180,10 @@ function Initialize(){
 	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
 		if(!j) board.push([]);
 		board[i].push($("<div class='block'>"+(i*N+j)+"</div>"));
-		if(i===emptyX&&j===emptyY) board[i][j]=$("<div class='empty'></div>");
+		if(i===emptyX&&j===emptyY) board[i][j].addClass("empty");
 		$(".board").append(board[i][j]);
 	}
+	updateCSS();
 
 	//Drag event listeners
 	var tmp;
@@ -92,11 +199,12 @@ function Initialize(){
 }
 
 var main = function(){
+
 	//$('.handler').offset({left:$('.handler').offset().left + 40.5});
 	Initialize();
 	
 
-	$('.resolve').click(resolve());
+	$('.solve').click(resolve);
 
 	var handler = $('.handler').offset().left;
 	$('.handler').draggable({

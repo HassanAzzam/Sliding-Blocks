@@ -4,7 +4,7 @@
     color: #333;
     font-family: "sans";
     font-weight: normal;
-    margin: 100px 0px 6px 40px;
+    margin: 130px 0px 6px 40px;
     display: inline;
     letter-spacing: 7.5px; 
 }
@@ -64,34 +64,28 @@ h1 {
 	background-color: #ddd;
 	margin-left: auto;
 	margin-top: 150px;
-	width: 354px;
-	height: 354px;
+	width: 600px;
+	height: 600px;
 	float: left;
     font-size: 47px;
     font-family: "sans-serif";
     font-weight: lighter;
     text-align: center;
-    line-height: 100px;
     color: #fff;
 }
 
 .block {
 	cursor : pointer;
-	margin: 13px 0 0 13px;
+	margin: 20px 0 0 20px;
 	float:left;
 	display: inline;
 	border-radius: 10px;
 	background-color: #0bb;
-	width: 100px;
-	height: 100px;
+	width: 270px;
+	height: 270px;
 }
 
 .empty{
-	margin: 13px 0 0 13px;
-	float:left;
-	display: inline;
-	border-radius: 10px;
 	background-color: #FFB030;
-	width: 100px;
-	height: 100px;
+	color: #FFB030;
 }
