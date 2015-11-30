@@ -5,6 +5,14 @@ var marginVal;
 var emptyX,emptyY;
 var N = 2;
 
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  while((new Date().getTime() - start) < milliseconds){
+  		$('.empty').hide();
+		$('.empty').show();
+	}
+}
+
 function moveLimit(dragged) {
 		//prompt(emptyX + " " + emptyY
 		var x1=(dragBlockl=dragged.offset().left)-marginVal;
@@ -60,6 +68,7 @@ function MoveGenerator(heu){
 		if(a[0]+a[1]>b[0]+b[1]) return 1;
 		return -1;
 	}});
+	var map = new Map();
 	var b=[];
 	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
 		if(!j) b.push([]);
@@ -81,18 +90,15 @@ function MoveGenerator(heu){
 			if(x>=cur[2]) heu--;
 			else heu++;
 			heu--;
-			if(!heu) {
-				alert(cur[0]+1);
-				return;
-			}	
 
 			var nb = $.extend(true, [], cur[4]); 
 			swapBoard(cur[2]-1,cur[3]);
 
 			Q.queue([cur[0]+1,heu,cur[2]-1,cur[3],nb]);
 
-			//swapBoard(cur[2]-1,cur[3]);
+			if(!map.has(nb)) map.set(nb,cur[4]);
 
+			if(!heu) return [map,nb];
 		}
 		if(cur[2]<N-1){
 			heu = cur[1];
@@ -106,7 +112,7 @@ function MoveGenerator(heu){
 
 			Q.queue([cur[0]+1,heu,cur[2]+1,cur[3],nb]);
 
-			//swapBoard(cur[2]+1,cur[3]);
+			if(!map.has(nb)) map.set(nb,cur[4]);
 		}
 		if(cur[3]>0){
 			heu = cur[1];
@@ -114,17 +120,15 @@ function MoveGenerator(heu){
 			if(y>=cur[3]) heu--;
 			else heu++;
 			heu--;
-			if(!heu) {
-				alert(cur[0]+1);
-				return;
-			}	
 
 			var nb = $.extend(true, [], cur[4]); 
 			swapBoard(cur[2],cur[3]-1);
 
 			Q.queue([cur[0]+1,heu,cur[2],cur[3]-1,nb]);
 
-			//swapBoard(cur[2],cur[3]-1);
+			if(!map.has(nb)) map.set(nb,cur[4]);
+
+			if(!heu) return [map,nb];
 		}
 		if(cur[3]<N-1){
 			heu = cur[1];
@@ -138,20 +142,49 @@ function MoveGenerator(heu){
 
 			Q.queue([cur[0]+1,heu,cur[2],cur[3]+1,nb]);
 
-			//swapBoard(cur[2],cur[3]+1);
+			if(!map.has(nb)) map.set(nb,cur[4]);
 		}
 	}
 }
 
 var resolve = function(){
+	function swap(x,y){
+		var tmp = x;
+		x = y;
+		y = tmp;
+	}
 	var heu=0;
 	for(var i=0;i<N;i++) for(var j=0;j<N;j++){
 		var x = Math.floor(parseInt(board[i][j][0].outerText,10)/N);
 		var y = Math.floor(parseInt(board[i][j][0].outerText,10)%N);
 		heu+=Math.abs(i-x)+Math.abs(j-y);
 	}
-	MoveGenerator(heu);
+	var ret = MoveGenerator(heu);
+	var map = ret[0];
+	var b=ret[1];
+	var moves = [];
+	moves.push([0,0,0,0	]);
+	var tmp ;
+	while(tmp = map.get(b)){
+		b=tmp;
+		for(var i=0;i<N;i++) for(var j=0;j<N;j++){
+			if(!b[i][j]) moves.push([i*marginVal+i*$('.block').height(),j*marginVal+j*$('.block').height(),i,j]);
+		}
+	}
 
+	for(var i=moves.length-1;i>=1;i--){
+		$('.empty').animate({
+			top: moves[i-1][0],
+			left: moves[i-1][1]
+		},700,(function(j){	return function(){
+			board[moves[j-1][2]][moves[j-1][3]].offset({
+				top: $('.board').offset().top+marginVal+moves[j][0], 
+				left: $('.board').offset().left+marginVal+moves[j][1]
+			});
+			swap(board[moves[j-1][2]][moves[j-1][3]],board[moves[j][2]][moves[j][3]]);
+			}
+		})(i));
+	}
 }
 
 function updateCSS(){
@@ -162,9 +195,21 @@ function updateCSS(){
 		"margin-left": marginVal, 
 		"height": length, 
 		"width": length,
-		"font-size": 4*marginVal
+		"font-size": 4*marginVal,
+		"border-radius": marginVal
 	});
 
+	//
+	var tmp;
+	$('.block').mousedown(function(){
+		tmp = moveLimit($(this));
+	}).mousemove(function(){
+		$('.block').draggable({
+			"scroll":false,
+			containment:tmp,
+			stop: swapBlocks
+		});
+	});
 }
 
 function Initialize(){
@@ -188,18 +233,6 @@ function Initialize(){
 		$(".board").append(board[i][j]);
 	}
 	updateCSS();
-
-	//Drag event listeners
-	var tmp;
-	$('.block').mousedown(function(){
-		tmp = moveLimit($(this));
-	}).mousemove(function(){
-		$('.block').draggable({
-			"scroll":false,
-			containment:tmp,
-			stop: swapBlocks
-		});
-	});
 }
 
 var main = function(){
