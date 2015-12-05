@@ -4,17 +4,21 @@
     color: #333;
     font-family: "sans";
     font-weight: normal;
-    margin: 130px 0px 6px 40px;
+    margin: 130px 0px 6px 56px;
     display: inline;
     letter-spacing: 7.5px; 
+    width: 150px;
+    display: block;
 }
 
 .slider-body {
 	border-radius: 7px;
 	height: 10px;
 	background-color: #ddd;
-	margin: 0px 0px 0px 40px;
+	margin: 10px 0px 0px 40px;
  	padding: 0;
+ 	width: 320px;
+ 	display: block;
 }
 
 .handler {
@@ -22,7 +26,8 @@
 	background-color: #333;
 	width: 20px;
 	height: 20px;
-	margin: -5px 0px 0px 7.5px;
+	margin: -5px 0px 0px 10px;
+	display: block;
 }
 
 h1 {
@@ -33,6 +38,10 @@ h1 {
     color: #333;
     margin: 70px 0px 0px 40px;
     padding: 0;
+}
+
+#container{
+	margin:0 0 0 0;
 }
 
 
@@ -63,7 +72,7 @@ h1 {
 	border-radius: 10px;
 	background-color: #ddd;
 	margin-left: auto;
-	margin-top: 150px;
+	margin-top: 100px;
 	width: 600px;
 	height: 600px;
 	float: left;
@@ -72,6 +81,9 @@ h1 {
     font-weight: lighter;
     text-align: center;
     color: #fff;
+    position: relative;
+    top:0;
+    left: 0;
 }
 
 .block {
@@ -83,9 +95,14 @@ h1 {
 	background-color: #0bb;
 	width: 270px;
 	height: 270px;
+	position: absolute;
+
+	z-index: 1;
 }
 
 .empty{
 	background-color: #FFB030;
 	color: #FFB030;
+
+	z-index: 0;
 }
