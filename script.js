@@ -186,6 +186,7 @@ var resolve = function(){
 	}
 	if(!heu) return;
 	$( ".solve" ).unbind( "click", resolve );
+	$( ".block" ).draggable( 'disable' );
 	var ret = MoveGenerator(heu);
 	var map = ret[0];
 	var b=ret[1];
@@ -200,7 +201,7 @@ var resolve = function(){
 	}
 
 	function anm(i){
-		if(!i){ $('.solve').on("click",resolve); return; }
+		if(!i){ $('.solve').on("click",resolve); $( ".block" ).draggable( 'enable' ); return; }
 
 			$('.empty').animate({
 				top: moves[i-1][0],
@@ -231,8 +232,10 @@ function updateCSS(){
 		"height": blockD, 
 		"width": blockD,
 		"font-size": 4*marginVal,
-		"border-radius": marginVal
+		"border-radius": marginVal,
 	});
+	
+	$('.block').css("line-height",(blockD-marginVal)+"px");
 
 	//
 	var tmp;
@@ -253,8 +256,8 @@ function Initialize(){
 	blockD = 7*marginVal;
 
 	board=[];
-	var t = $('.col-md-7').height()/2-$('.board').height()/2;
-	var l = $('.col-md-7').width()/2-$('.board').width()/2;
+	var t = $('#container').height()/2-$('.board').height()/2;
+	var l = $('#container').width()/2-$('.board').width()/2;
 
 	$('.board').offset({top: t, left: l + $('#container').offset().left });
 	emptyX=emptyY=N-1;
@@ -282,10 +285,10 @@ var main = function(){
 			handler = $('.handler').offset().left;
 		},
 		axis: 'x',
-		grid: [40.5,0],
+		grid: [39.2,0],
 		containment: "parent",
 		drag: function(e,ui){
-			N=2+Math.floor(($('.handler').offset().left-47.5)/40.5);
+			N=2+Math.floor(($('.handler').offset().left-47.5)/39.2);
 			Initialize();
 		}
 	});

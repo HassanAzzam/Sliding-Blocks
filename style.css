@@ -1,23 +1,35 @@
-
+body{
+	width:1340px;
+	height:675px;
+	margin:0;
+	padding:0;
+	top:0;
+	left:0;
+	background-color: #eee;
+	
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
 .indicator {
 	font-weight: lighter;
     color: #333;
-    font-family: "sans";
+    font-family: 'Open Sans', sans-serif;
     font-weight: normal;
-    margin: 130px 0px 6px 56px;
-    display: inline;
+    margin: 130px 0px 0px 75px;	
     letter-spacing: 7.5px; 
     width: 150px;
-    display: block;
+    display: inline;
+	font-size:15px;
 }
 
 .slider-body {
 	border-radius: 7px;
 	height: 10px;
 	background-color: #ddd;
-	margin: 10px 0px 0px 40px;
+	margin: 8px 0px 0px 58px;
  	padding: 0;
- 	width: 320px;
+ 	width: 315px;
  	display: block;
 }
 
@@ -26,38 +38,45 @@
 	background-color: #333;
 	width: 20px;
 	height: 20px;
-	margin: -5px 0px 0px 10px;
+	margin: 0px 0px 0px 10px;
 	display: block;
+	top:-5px;
 }
 
 h1 {
-	font-size: 56px;
-    font-family: "sans";
+	font-size: 75px;
+    font-family: 'Open Sans', sans-serif;
     font-weight: lighter;
     float:left;
     color: #333;
-    margin: 70px 0px 0px 40px;
+    margin: 70px 0px 0px 75px;
     padding: 0;
+	width:380px;
 }
 
 #container{
 	margin:0 0 0 0;
+	float:right; 
+	height:675px;
+	width: 800px;
 }
 
 
 .solve {
 	border-radius: 7px;
-	height: 100px;
+	height: 120px;
 	background-color: #0bb;
     color: #fff;
     font-size: 64px;
-    font-family: "sans";
+    font-family: 'Open Sans', sans-serif;
     font-weight: lighter;
     text-align: center;
-    line-height: 100px;
+    line-height: 120px;
     margin: 70px 0px 0px 60px;
     transition: 0.25s;
     padding: 0;
+	width:350px;
+	float:left;
 }
 
 .solve:hover {
@@ -71,13 +90,13 @@ h1 {
 	padding: 0;
 	border-radius: 10px;
 	background-color: #ddd;
-	margin-left: auto;
+	margin-left: 0;
 	margin-top: 100px;
 	width: 600px;
 	height: 600px;
 	float: left;
     font-size: 47px;
-    font-family: "sans-serif";
+    font-family: 'Open Sans', sans-serif;
     font-weight: lighter;
     text-align: center;
     color: #fff;
@@ -86,7 +105,7 @@ h1 {
     left: 0;
 }
 
-.block {
+.block {	
 	cursor : pointer;
 	margin: 20px 0 0 20px;
 	float:left;
@@ -96,7 +115,6 @@ h1 {
 	width: 270px;
 	height: 270px;
 	position: absolute;
-
 	z-index: 1;
 }
 
